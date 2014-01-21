@@ -3,11 +3,10 @@ var username = window.location.search.split('=')[1];
 var chatRooms = {};
 
 var renderChat = function(data) {
-    addRoom(data.roomname);
     var $li = $('<li></li>');
     var $username = $('<p class="name"></p>').text('User: @' + data.username);
     var $chatroom = $('<p></p>').text('Room: ' + data.roomname);
-    var $date = $('<p></p>').text('Date: ' + data.createdAt);
+    var $date = $('<p></p>').text('Date: ' + moment(data.createdAt).fromNow());
     var $message = $('<p></p>').text(data.text);
     $li.append($username)
         .append($chatroom)
