@@ -14,6 +14,9 @@
     <!-- internal javascript -->
     <script src="scripts/config.js"></script>
     <style>
+      body{
+        display: block;
+      }
       ul{
         list-style: none;
       }
@@ -37,10 +40,14 @@
         <input type='text' name='message' placeholder='Type a message here...'>
         <input type='submit'>
       </form>
-      <!-- <form class='selectChatRoom'> -->
       <label>Choose a chat room</label>
       <select class='chatRooms'>
       </select>
+      <label>Create a chat room</label>
+      <form class='createChatRoom'>
+        <input type='text' name='chatRoomName' placeholder='newroom...'>
+        <input type='submit' value='New Room'>
+      </form>
       <ul class='chats'><ul>
     </div>
     <script src="scripts/app.js"></script>

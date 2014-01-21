@@ -124,10 +124,16 @@ $(document).ready(function() {
     };
     setInterval(getByChatRoom, 1000);
     $('.username').text('Hello, @' + username);
-    $('form').submit(function(e) {
+    $('.sendMessage').submit(function(e) {
         e.preventDefault();
         createMessage($('input[name="message"]').val());
     });
+    $('.createChatRoom').submit(function(e) {
+        e.preventDefault();
+        roomname = $('input[name="chatRoomName"]').val();
+        createMessage('New room created by @' + username);
+        checkRooms();
+    })
     $('select').on('change', function(e) {
         e.preventDefault();
         roomname = $('select option:selected').val();
