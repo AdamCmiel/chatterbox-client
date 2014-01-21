@@ -78,8 +78,8 @@ var checkRooms = function() {
             //doNothing
         } else {
             chatRooms[roomname] = roomname;
-            var $newOption = $('<option value=' + JSON.stringify(roomname) + '></option>').text(roomname);
-            $('.chatRooms').append($newOption);
+            var $newOption = $('<option value=' + JSON.stringify(roomname) + ' selected></option>').text(roomname);
+            $('.chatRooms').prepend($newOption);
         }
     };
     getMessages(undefined, function(data) {
@@ -95,16 +95,23 @@ $(document).ready(function() {
     var username = window.location.search.split('=')[1];
     var roomname = '4chan';
     var friends = [];
-    setInterval(getMessages, 1000);
     checkRooms();
+    var getByChatRoom = function() {
+        getMessages(undefined, function(data) {
+            var results = data.results;
+            var resultsInRoom = _.filter(results, function(result) {
+                return result.roomname === roomname
+            });
+            parseGet({
+                results: resultsInRoom
+            });
+        });
+        setTimeout(function() {
+            $('.loadingMessage').fadeOut().hide();
+        }, 1500);
+    };
+    setInterval(getByChatRoom, 1000);
     $('.username').text('Hello, @' + username);
-    $('.getNewMessages').on('click', function(e) {
-        e.preventDefault();
-        console.log(roomname);
-        var query = 'where={"roomname":' + roomname + '}';
-        // getMessages(query);
-        getMessages('limit=50');
-    });
     $('form').submit(function(e) {
         e.preventDefault();
         createMessage($('input[name="message"]').val());
@@ -114,12 +121,10 @@ $(document).ready(function() {
         roomname = $('select option:selected').val();
         $('.chatRoomLabel').text('Welcome to chatroom: ' + roomname);
     });
-    $('.name').delegate('click', function(e) {
-        alert('yo');
+    $('.name').click(function(e) {
         e.preventDefault();
         friends.push(this.text());
         this.addClass('friend');
         console.log(friends);
     });
-
 });
