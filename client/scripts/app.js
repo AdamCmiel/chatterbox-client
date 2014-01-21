@@ -155,7 +155,7 @@ $(document).ready(function() {
         roomname = $('select option:selected').val();
         $('.chatRoomLabel').text('Welcome to chatroom: ' + roomname);
         clearInterval(autoRefresh);
-        var autoRefresh = setInterval(getByChatRoom, 1000);
+        autoRefresh = setInterval(getByChatRoom, 1000);
     });
     $('.chats').click('.name', function(e) {
         e.preventDefault();
