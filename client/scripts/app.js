@@ -93,7 +93,7 @@ var checkRooms = function() {
 
 $(document).ready(function() {
     var username = window.location.search.split('=')[1];
-    var roomname = '4chan';
+    roomname = '4chan';
     var friends = [];
     checkRooms();
     var getByChatRoom = function() {
@@ -119,6 +119,7 @@ $(document).ready(function() {
     $('select').on('change', function(e) {
         e.preventDefault();
         roomname = $('select option:selected').val();
+        console.log(roomname);
         $('.chatRoomLabel').text('Welcome to chatroom: ' + roomname);
     });
     $('.name').click(function(e) {
