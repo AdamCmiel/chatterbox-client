@@ -3,6 +3,7 @@ var username = window.location.search.split('=')[1];
 var chatRooms = {};
 var count = 0;
 var lastGet = [];
+var friends = [];
 
 var renderChat = function(data) {
     var $li = $('<li>' + count + '</li>');
@@ -28,6 +29,7 @@ var parseGet = function(data) {
         _.each(results, function(result) {
             renderChat(result);
         });
+        highlightFriends();
     }
 };
 
@@ -89,12 +91,22 @@ var checkRooms = function() {
     });
 };
 
+var highlightFriends = function() {
+    _.each(friends, function(username) {
+        $('.name').each(function() {
+            var $user = $(this);
+            if ($user.text().split('@')[1] === username) {
+                $user.addClass('friend');
+            }
+        })
+    });
+}
+
 
 
 $(document).ready(function() {
     var username = window.location.search.split('=')[1];
     roomname = '4chan';
-    var friends = [];
     checkRooms();
     var getByChatRoom = function() {
         getMessages(undefined, function(data) {
@@ -119,13 +131,12 @@ $(document).ready(function() {
     $('select').on('change', function(e) {
         e.preventDefault();
         roomname = $('select option:selected').val();
-        console.log(roomname);
         $('.chatRoomLabel').text('Welcome to chatroom: ' + roomname);
     });
-    $('.name').click(function(e) {
+    $('.chats').click('.name', function(e) {
         e.preventDefault();
-        friends.push(this.text());
-        this.addClass('friend');
-        console.log(friends);
+        var $user = $(e.target);
+        friends.push($user.text().split('@')[1]);
+        highlightFriends();
     });
 });
