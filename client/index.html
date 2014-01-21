@@ -14,7 +14,7 @@
     <!-- internal javascript -->
     <script src="scripts/config.js"></script>
     <style>
-      body{
+      body, label{
         display: block;
       }
       ul{
@@ -36,6 +36,8 @@
       <h1>Chat-Client</h1>
       <label class='chatRoomLabel'></label>
       <label class='username'></label>
+      <label class='showUsers'>Friends</label>
+      <ul class='friends'></ul>
       <form class='sendMessage'>
         <input type='text' name='message' placeholder='Type a message here...'>
         <input type='submit'>

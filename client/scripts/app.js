@@ -102,6 +102,22 @@ var highlightFriends = function() {
     });
 }
 
+var pushFriend = function(username) {
+    friends.push(username);
+    $('<li></li>').text('@' + username).addClass('friend').addClass('toShow').appendTo('.friends');
+}
+
+var showMessagesByFriend = function(username) {
+    getMessages(undefined, function(data) {
+        var results = data.results;
+        var resultsByUser = _.filter(results, function(result) {
+            return result.username === username;
+        });
+        parseGet({
+            results: resultsByUser
+        });
+    });
+}
 
 
 $(document).ready(function() {
@@ -122,7 +138,7 @@ $(document).ready(function() {
             $('.loadingMessage').fadeOut().hide();
         }, 1500);
     };
-    setInterval(getByChatRoom, 1000);
+    var autoRefresh = setInterval(getByChatRoom, 1000);
     $('.username').text('Hello, @' + username);
     $('.sendMessage').submit(function(e) {
         e.preventDefault();
@@ -138,11 +154,21 @@ $(document).ready(function() {
         e.preventDefault();
         roomname = $('select option:selected').val();
         $('.chatRoomLabel').text('Welcome to chatroom: ' + roomname);
+        clearInterval(autoRefresh);
+        var autoRefresh = setInterval(getByChatRoom, 1000);
     });
     $('.chats').click('.name', function(e) {
         e.preventDefault();
         var $user = $(e.target);
-        friends.push($user.text().split('@')[1]);
+        pushFriend($user.text().split('@')[1])
         highlightFriends();
     });
+    $('.friends').click('.toShow', function(e) {
+        e.preventDefault();
+        var $user = $(e.target);
+        clearInterval(autoRefresh);
+        autoRefresh = setInterval(function() {
+            showMessagesByFriend($user.text().split('@')[1])
+        }, 1000);
+    })
 });
