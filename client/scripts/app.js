@@ -1,9 +1,12 @@
 var url = 'https://api.parse.com/1/classes/chatterbox';
 var username = window.location.search.split('=')[1];
 var chatRooms = {};
+var count = 0;
+var lastGet = [];
 
 var renderChat = function(data) {
-    var $li = $('<li></li>');
+    var $li = $('<li>' + count + '</li>');
+    count++;
     var $username = $('<p class="name"></p>').text('User: @' + data.username);
     var $chatroom = $('<p></p>').text('Room: ' + data.roomname);
     var $date = $('<p></p>').text('Date: ' + moment(data.createdAt).fromNow());
@@ -12,14 +15,20 @@ var renderChat = function(data) {
         .append($chatroom)
         .append($date)
         .append($message);
-    $('.chats').append($li);
+    $('.chats').append($li).hide().fadeIn();
 };
 
 var parseGet = function(data) {
     var results = data.results;
-    _.each(results, function(result) {
-        renderChat(result);
-    });
+    if (_.isEqual(lastGet[0], results[0])) {
+        //do nothing
+    } else {
+        lastGet = results;
+        $('.chats').html("");
+        _.each(results, function(result) {
+            renderChat(result);
+        });
+    }
 };
 
 var postMessage = function(message) {
@@ -38,9 +47,10 @@ var postMessage = function(message) {
 };
 
 var getMessages = function(options, callback) {
+    count = 0;
     options || (options = {
         order: '-createdAt',
-        limit: 1000
+        limit: 100
     });
     callback || (callback = parseGet);
     $.getJSON(url, options, callback);
@@ -61,14 +71,12 @@ var createMessage = function(message) {
 var checkRooms = function() {
     var addRoom = function(roomname) {
         if (roomname === 'undefined' ||
-            roomname === undefined ||
             roomname === 'null' ||
-            roomname === null ||
             roomname === "" ||
+            typeof roomname !== 'string' ||
             chatRooms[roomname]) {
             //doNothing
         } else {
-            console.log(chatRooms);
             chatRooms[roomname] = roomname;
             var $newOption = $('<option value=' + JSON.stringify(roomname) + '></option>').text(roomname);
             $('.chatRooms').append($newOption);
@@ -81,15 +89,21 @@ var checkRooms = function() {
     });
 };
 
+
+
 $(document).ready(function() {
     var username = window.location.search.split('=')[1];
     var roomname = '4chan';
-    getMessages();
+    var friends = [];
+    setInterval(getMessages, 1000);
     checkRooms();
     $('.username').text('Hello, @' + username);
     $('.getNewMessages').on('click', function(e) {
         e.preventDefault();
-        getMessages();
+        console.log(roomname);
+        var query = 'where={"roomname":' + roomname + '}';
+        // getMessages(query);
+        getMessages('limit=50');
     });
     $('form').submit(function(e) {
         e.preventDefault();
@@ -99,6 +113,13 @@ $(document).ready(function() {
         e.preventDefault();
         roomname = $('select option:selected').val();
         $('.chatRoomLabel').text('Welcome to chatroom: ' + roomname);
-    })
+    });
+    $('.name').delegate('click', function(e) {
+        alert('yo');
+        e.preventDefault();
+        friends.push(this.text());
+        this.addClass('friend');
+        console.log(friends);
+    });
 
 });
