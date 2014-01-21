@@ -1,10 +1,12 @@
 var url = 'https://api.parse.com/1/classes/chatterbox';
 var username = window.location.search.split('=')[1];
+var chatRooms = {};
 
 var renderChat = function(data) {
+    addRoom(data.roomname);
     var $li = $('<li></li>');
     var $username = $('<p class="name"></p>').text('User: @' + data.username);
-    var $chatroom = $('<p></p>').text('Room: -' + data.roomname);
+    var $chatroom = $('<p></p>').text('Room: ' + data.roomname);
     var $date = $('<p></p>').text('Date: ' + data.createdAt);
     var $message = $('<p></p>').text(data.text);
     $li.append($username)
@@ -36,12 +38,13 @@ var postMessage = function(message) {
     });
 };
 
-var getMessages = function(options) {
+var getMessages = function(options, callback) {
     options || (options = {
         order: '-createdAt',
         limit: 1000
     });
-    $.getJSON(url, options, parseGet);
+    callback || (callback = parseGet);
+    $.getJSON(url, options, callback);
 };
 
 var roomname = 'testING';
@@ -56,10 +59,34 @@ var createMessage = function(message) {
     );
 };
 
+var checkRooms = function() {
+    var addRoom = function(roomname) {
+        if (roomname === 'undefined' ||
+            roomname === undefined ||
+            roomname === 'null' ||
+            roomname === null ||
+            roomname === "" ||
+            chatRooms[roomname]) {
+            //doNothing
+        } else {
+            console.log(chatRooms);
+            chatRooms[roomname] = roomname;
+            var $newOption = $('<option value=' + JSON.stringify(roomname) + '></option>').text(roomname);
+            $('.chatRooms').append($newOption);
+        }
+    };
+    getMessages(undefined, function(data) {
+        _.each(data.results, function(result) {
+            addRoom(result.roomname);
+        });
+    });
+};
+
 $(document).ready(function() {
     var username = window.location.search.split('=')[1];
     var roomname = '4chan';
     getMessages();
+    checkRooms();
     $('.username').text('Hello, @' + username);
     $('.getNewMessages').on('click', function(e) {
         e.preventDefault();
@@ -69,4 +96,10 @@ $(document).ready(function() {
         e.preventDefault();
         createMessage($('input[name="message"]').val());
     });
+    $('select').on('change', function(e) {
+        e.preventDefault();
+        roomname = $('select option:selected').val();
+        $('.chatRoomLabel').text('Welcome to chatroom: ' + roomname);
+    })
+
 });
